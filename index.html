@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexus Analytics — Industrial Analytics Platform</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jstat/1.9.6/jstat.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+      <rect x="0" y="0" width="12" height="12" fill="#E8FF47"/>
+      <rect x="14" y="0" width="14" height="6" fill="#E8FF47" opacity="0.5"/>
+      <rect x="0" y="14" width="6" height="14" fill="#E8FF47" opacity="0.5"/>
+      <rect x="14" y="14" width="14" height="14" fill="#E8FF47"/>
+    </svg>
+    <span class="logo-text">Nexus Analytics</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a href="#" class="nav-item active" data-view="dashboard" onclick="switchView('dashboard', this)">
+      <svg viewBox="0 0 20 20"><rect x="1" y="1" width="7" height="7" rx="1" fill="currentColor"/><rect x="12" y="1" width="7" height="7" rx="1" fill="currentColor"/><rect x="1" y="12" width="7" height="7" rx="1" fill="currentColor"/><rect x="12" y="12" width="7" height="7" rx="1" fill="currentColor"/></svg>
+      Overview
+    </a>
+    <a href="#" class="nav-item" data-view="explorer" onclick="switchView('explorer', this)">
+      <svg viewBox="0 0 20 20"><path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zm5.657-2.343l3.686 3.686" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+      Data Explorer
+    </a>
+    <a href="#" class="nav-item" data-view="analytics" onclick="switchView('analytics', this)">
+      <svg viewBox="0 0 20 20"><polyline points="1 14 7 8 11 12 19 4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Analytics
+    </a>
+    <a href="#" class="nav-item" data-view="correlation" onclick="switchView('correlation', this)">
+      <svg viewBox="0 0 20 20"><circle cx="4" cy="16" r="2" fill="currentColor"/><circle cx="10" cy="10" r="2" fill="currentColor"/><circle cx="16" cy="4" r="2" fill="currentColor"/><line x1="5.4" y1="14.6" x2="8.6" y2="11.4" stroke="currentColor" stroke-width="1.2"/><line x1="11.4" y1="8.6" x2="14.6" y2="5.4" stroke="currentColor" stroke-width="1.2"/></svg>
+      Correlation
+    </a>
+    <a href="#" class="nav-item" data-view="reports" onclick="switchView('reports', this)">
+      <svg viewBox="0 0 20 20"><rect x="3" y="1" width="14" height="18" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="7" y1="6" x2="13" y2="6" stroke="currentColor" stroke-width="1.5"/><line x1="7" y1="10" x2="13" y2="10" stroke="currentColor" stroke-width="1.5"/><line x1="7" y1="14" x2="10" y2="14" stroke="currentColor" stroke-width="1.5"/></svg>
+      Reports
+    </a>
+    <a href="#" class="nav-item" data-view="sql" onclick="switchView('sql', this)">
+      <svg viewBox="0 0 20 20"><ellipse cx="10" cy="5" rx="7" ry="3" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M3 5v4c0 1.657 3.134 3 7 3s7-1.343 7-3V5" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M3 9v4c0 1.657 3.134 3 7 3s7-1.343 7-3V9" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+      SQL Console
+    </a>
+    <a href="#" class="nav-item" data-view="forecast" onclick="switchView('forecast', this)">
+      <svg viewBox="0 0 20 20"><polyline points="1 16 6 10 10 13 19 3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="13" y1="17" x2="19" y2="17" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 1.5" stroke-linecap="round"/><line x1="16" y1="14" x2="19" y2="17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="16" y1="20" x2="19" y2="17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Forecast
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-pill">
+      <div class="avatar">VS</div>
+      <div class="user-info">
+        <span class="user-name">Vansh Swami</span>
+        <span class="user-role">Lead Analyst</span>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="breadcrumb" id="breadcrumb">Overview</div>
+    </div>
+    <div class="topbar-right">
+      <div class="dataset-info" id="datasetInfo">
+        <span class="dataset-pill">No dataset loaded</span>
+      </div>
+      <label class="upload-btn" for="csvUpload">
+        <svg viewBox="0 0 16 16" width="14" height="14"><path d="M8 1v9M4 5l4-4 4 4M2 13h12" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+        Import CSV
+        <input type="file" id="csvUpload" accept=".csv" onchange="loadCSV(event)" hidden />
+      </label>
+      <button class="btn-ghost" onclick="loadSampleData()">Load Demo</button>
+    </div>
+  </header>
+
+  <!-- VIEWS -->
+  <div class="view-container">
+
+    <!-- ===== DASHBOARD VIEW ===== -->
+    <section class="view active" id="view-dashboard">
+      <div class="view-header">
+        <h1 class="view-title">Operational Overview</h1>
+        <p class="view-subtitle" id="dashSubtitle">Load a dataset or use demo data to begin analysis.</p>
+      </div>
+
+      <!-- KPI STRIP -->
+      <div class="kpi-strip" id="kpiStrip">
+        <div class="kpi-card">
+          <div class="kpi-label">Total Records</div>
+          <div class="kpi-value" id="kpiRows">—</div>
+          <div class="kpi-delta neutral">Awaiting data</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Columns</div>
+          <div class="kpi-value" id="kpiCols">—</div>
+          <div class="kpi-delta neutral">Fields detected</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Numeric Fields</div>
+          <div class="kpi-value" id="kpiNumeric">—</div>
+          <div class="kpi-delta neutral">Quantitative</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Completeness</div>
+          <div class="kpi-value" id="kpiComplete">—</div>
+          <div class="kpi-delta neutral">Data quality</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Outliers Detected</div>
+          <div class="kpi-value" id="kpiOutliers">—</div>
+          <div class="kpi-delta neutral">IQR method</div>
+        </div>
+      </div>
+
+      <!-- MAIN CHARTS -->
+      <div class="chart-grid">
+        <div class="chart-card wide">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-title">Distribution — Primary Column</div>
+              <div class="chart-meta" id="distMeta">No data</div>
+            </div>
+            <select class="ctrl-select" id="distColSelect" onchange="renderDistribution()">
+              <option>— select column —</option>
+            </select>
+          </div>
+          <div class="chart-wrap"><canvas id="chartDist"></canvas></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-title">Column Profile</div>
+              <div class="chart-meta">Missing, unique, type</div>
+            </div>
+          </div>
+          <div class="profile-table-wrap" id="profileTableWrap">
+            <div class="empty-state">No dataset loaded</div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-title">Category Breakdown</div>
+              <div class="chart-meta" id="catMeta">No data</div>
+            </div>
+            <select class="ctrl-select" id="catColSelect" onchange="renderCategoryBreakdown()">
+              <option>— select column —</option>
+            </select>
+          </div>
+          <div class="chart-wrap"><canvas id="chartCat"></canvas></div>
+        </div>
+
+        <div class="chart-card wide">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-title">Trend / Time Series</div>
+              <div class="chart-meta" id="trendMeta">No data</div>
+            </div>
+            <div class="ctrl-row">
+              <select class="ctrl-select" id="trendXSelect" onchange="renderTrend()"><option>— X axis —</option></select>
+              <select class="ctrl-select" id="trendYSelect" onchange="renderTrend()"><option>— Y axis —</option></select>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="chartTrend"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== DATA EXPLORER VIEW ===== -->
+    <section class="view" id="view-explorer">
+      <div class="view-header">
+        <h1 class="view-title">Data Explorer</h1>
+        <p class="view-subtitle">Inspect, filter, and search your raw dataset.</p>
+      </div>
+      <div class="explorer-toolbar">
+        <input type="text" class="search-input" id="tableSearch" placeholder="Search any value across all columns…" oninput="filterTable()" />
+        <span class="row-counter" id="rowCounter">0 rows</span>
+        <button class="btn-ghost" onclick="exportFilteredCSV()">Export filtered CSV</button>
+      </div>
+      <div class="table-wrap" id="tableWrap">
+        <div class="empty-state">Load a dataset to explore records.</div>
+      </div>
+    </section>
+
+    <!-- ===== ANALYTICS VIEW ===== -->
+    <section class="view" id="view-analytics">
+      <div class="view-header">
+        <h1 class="view-title">Statistical Analytics</h1>
+        <p class="view-subtitle">Descriptive statistics, box plots, and anomaly detection per numeric column.</p>
+      </div>
+      <div class="analytics-col-picker" id="analyticsColPicker">
+        <div class="empty-state">Load a dataset first.</div>
+      </div>
+      <div class="analytics-grid" id="analyticsGrid"></div>
+    </section>
+
+    <!-- ===== CORRELATION VIEW ===== -->
+    <section class="view" id="view-correlation">
+      <div class="view-header">
+        <h1 class="view-title">Correlation Matrix</h1>
+        <p class="view-subtitle">Pearson correlation coefficients between all numeric columns.</p>
+      </div>
+      <div class="corr-controls">
+        <label class="ctrl-label">
+          Threshold filter
+          <input type="range" min="0" max="1" step="0.05" value="0" id="corrThreshold" oninput="renderCorrelation()" />
+          <span id="corrThreshVal">0.00</span>
+        </label>
+        <label class="ctrl-label">
+          <input type="checkbox" id="corrAbs" onchange="renderCorrelation()" /> Show absolute values
+        </label>
+      </div>
+      <div id="corrMatrixWrap" class="corr-matrix-wrap">
+        <div class="empty-state">Load a dataset with numeric columns.</div>
+      </div>
+    </section>
+
+    <!-- ===== REPORTS VIEW ===== -->
+    <section class="view" id="view-reports">
+      <div class="view-header">
+        <h1 class="view-title">Automated Report</h1>
+        <p class="view-subtitle">A generated data quality and insight report for your current dataset.</p>
+      </div>
+      <div id="reportContainer">
+        <div class="empty-state">Load a dataset to generate a report.</div>
+      </div>
+      <div class="report-actions" id="reportActions" style="display:none">
+        <button class="btn-primary" onclick="exportReport()">Export Report as HTML</button>
+      </div>
+    </section>
+
+    <!-- ===== SQL CONSOLE VIEW ===== -->
+    <section class="view" id="view-sql">
+      <div class="view-header">
+        <h1 class="view-title">SQL Console</h1>
+        <p class="view-subtitle">Real SQLite queries in the browser — your CSV becomes a table named <code class="inline-code">data</code>. Press <kbd>Ctrl+Enter</kbd> to run.</p>
+      </div>
+      <div class="sql-layout">
+        <div class="sql-editor-panel">
+          <div class="sql-editor-topbar">
+            <span class="sql-db-badge" id="sqlDbBadge">⬡ No table loaded</span>
+            <div style="display:flex;gap:8px">
+              <button class="btn-ghost" onclick="clearSQLEditor()">Clear</button>
+              <button class="btn-primary" onclick="runSQL()">▶ Run</button>
+            </div>
+          </div>
+          <textarea class="sql-editor" id="sqlEditor" placeholder="-- Table name: data&#10;-- All column names are quoted exactly as in your CSV&#10;&#10;SELECT * FROM data LIMIT 10;" spellcheck="false"></textarea>
+          <div class="sql-chips-bar" id="sqlChipsBar">
+            <span style="color:var(--text-muted);font-size:11px">Quick:</span>
+          </div>
+        </div>
+        <div class="sql-results-panel" id="sqlResultsPanel">
+          <div class="empty-state">Load a dataset and run a query to see results here.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FORECAST VIEW ===== -->
+    <section class="view" id="view-forecast">
+      <div class="view-header">
+        <h1 class="view-title">Linear Regression &amp; Forecast</h1>
+        <p class="view-subtitle">Fit a least-squares regression line between any two numeric columns and predict new values.</p>
+      </div>
+      <div class="forecast-controls" id="forecastControls">
+        <div class="empty-state">Load a dataset with at least 2 numeric columns to begin.</div>
+      </div>
+      <div class="forecast-layout" id="forecastLayout" style="display:none">
+        <div class="forecast-chart-card">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-title">Scatter Plot + Regression Line</div>
+              <div class="chart-meta" id="forecastChartMeta">—</div>
+            </div>
+          </div>
+          <div style="height:320px"><canvas id="chartForecast"></canvas></div>
+        </div>
+        <div class="forecast-side">
+          <div class="forecast-eq-card">
+            <div class="stat-card-title">Regression Equation</div>
+            <div class="reg-equation" id="regEquation">ŷ = — · x + —</div>
+            <div class="reg-stats-grid">
+              <div class="reg-stat"><div class="reg-stat-label">R²</div><div class="reg-stat-val" id="regR2">—</div></div>
+              <div class="reg-stat"><div class="reg-stat-label">Pearson r</div><div class="reg-stat-val" id="regR">—</div></div>
+              <div class="reg-stat"><div class="reg-stat-label">Slope (m)</div><div class="reg-stat-val" id="regSlope">—</div></div>
+              <div class="reg-stat"><div class="reg-stat-label">Intercept (b)</div><div class="reg-stat-val" id="regIntercept">—</div></div>
+              <div class="reg-stat"><div class="reg-stat-label">RMSE</div><div class="reg-stat-val" id="regRMSE">—</div></div>
+              <div class="reg-stat"><div class="reg-stat-label">n (pairs)</div><div class="reg-stat-val" id="regN">—</div></div>
+            </div>
+            <div class="kpi-delta neutral" id="regQuality" style="margin-top:12px">—</div>
+          </div>
+          <div class="forecast-predict-card">
+            <div class="stat-card-title">Predict a Value</div>
+            <div class="predict-input-row">
+              <label class="predict-label" id="predictXLabel">X value</label>
+              <input type="number" class="predict-input" id="forecastXInput" placeholder="Enter X…" oninput="predictForecast()" />
+            </div>
+            <div class="predict-result-wrap" id="forecastPredWrap" style="display:none">
+              <div class="predict-arrow">↓</div>
+              <div class="predict-result-label" id="predictYLabel">Predicted Y</div>
+              <div class="predict-result-value" id="forecastPredResult">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
