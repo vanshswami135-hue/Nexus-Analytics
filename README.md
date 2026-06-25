@@ -108,7 +108,7 @@ nexus-analytics/
 
 ### Dashboard
 
-(<img width="1470" height="956" alt="dashboard" src="https://github.com/user-attachments/assets/0501f37d-85c3-4a2d-b9ab-37fe16af4c83" />
+(<img width="1463" height="796" alt="dashboard" src="https://github.com/user-attachments/assets/8d7676a0-269b-49ae-9600-66dd75793571" />
 )
 
 ---
