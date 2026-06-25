@@ -4,7 +4,7 @@
 
 Nexus Analytics is a browser-based Business Intelligence platform designed for exploratory data analysis, statistical profiling, and interactive visualization of CSV datasets. It enables analysts to upload datasets, perform descriptive analytics, explore relationships between variables, and generate business insights through an intuitive dashboard.
 
-**Live Demo:** https://YOUR_USERNAME.github.io/nexus-analytics/
+**Live Demo:** https://vanshswami135-hue.github.io/Nexus-Analytics//
 
 ---
 
@@ -108,34 +108,43 @@ nexus-analytics/
 
 ### Dashboard
 
-(Add Screenshot)
+(<img width="1470" height="956" alt="dashboard" src="https://github.com/user-attachments/assets/0501f37d-85c3-4a2d-b9ab-37fe16af4c83" />
+)
 
 ---
 
 ### Analytics
 
-(Add Screenshot)
+(<img width="1467" height="708" alt="Analytics" src="https://github.com/user-attachments/assets/350711e5-92a1-45dc-89c3-51c14cb44f18" />
+)
 
+---
+### SQL Console
+
+(<img width="1244" height="663" alt="SQL console" src="https://github.com/user-attachments/assets/76fcb2f2-66da-47d7-bbf6-f31710545403" />
+)
 ---
 
 ### Correlation Matrix
 
-(Add Screenshot)
+(<img width="869" height="450" alt="coorelation" src="https://github.com/user-attachments/assets/b91889a5-7d04-4151-9be3-39e374567560" />
+)
 
 ---
 
-### Reports
+### Forecasting
 
-(Add Screenshot)
-
+(<img width="1227" height="630" alt="forecasting" src="https://github.com/user-attachments/assets/df0698bb-465e-4a05-b95b-7ae89ea0b34a" />
+)
 ---
+
 
 ## How to Run
 
 Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/nexus-analytics.git
+git clone https://github.com/vanshswami135-hue/nexus-analytics.git
 ```
 
 Open the project folder
@@ -185,7 +194,8 @@ No installation or server setup is required.
 
 **Vansh Swami**
 
-B.Tech Computer Science Engineering
+B.Tech 
+Computer Science Engineering
 
 Delhi Technological University (DTU)
 
@@ -193,4 +203,4 @@ LinkedIn:
 https://www.linkedin.com/in/vansh-swami-461911288/
 
 GitHub:
-https://github.com/YOUR_USERNAME
+https://github.com/vanshswami135-hue
